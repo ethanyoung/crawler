@@ -25,7 +25,7 @@ int main(void) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
         res = curl_easy_perform(curl);
-        /* always cleanup */
+
         curl_easy_cleanup(curl);
         fclose(fp);
     }
