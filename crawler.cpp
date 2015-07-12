@@ -14,31 +14,23 @@ using namespace std;
 using namespace htmlcxx;
 using namespace boost::algorithm;
 
-/*
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-    size_t written = fwrite(ptr, size, nmemb, stream);
-    return written;
-}
-*/
-
 size_t write_to_string(void *ptr, size_t size, size_t count, void *stream) {
   ((string*)stream)->append((char*)ptr, 0, size*count);
   return size*count;
 }
 
-
 class Page {
-public: 
+public:
   string url;
   string body;
-  Page (string u, string b) {
-    url = u;
-    body = b;
+
+  Page (string url, string body) {
+    this->url = url;
+    this->body = body;
   }
 
   set<string> getUniqWords() {
     set<string> uniqueWords;
-    // string[] words = body.split(" ");
     vector<string> allWords;
     split(allWords, body, is_space());
     vector<string>::iterator it = allWords.begin();
@@ -57,19 +49,15 @@ public:
 string getPageContent(string url) {
   string content = "";
   CURL *curl;
-  //FILE *fp;
   CURLcode res;
-  //char outfilename[FILENAME_MAX] = "content.txt";
   curl = curl_easy_init();
   if (curl) {
-      //fp = fopen(outfilename,"wb");
       curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
       curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
       res = curl_easy_perform(curl);
 
       curl_easy_cleanup(curl);
-      //fclose(fp);
   }
   return content;
 }
@@ -93,26 +81,7 @@ set<string> getLinks(string html) {
 
   return links;
 }
-/*
-string getBody(string html) {
-  string body;
-  HTML::ParserDom parser;
-  tree<HTML::Node> dom = parser.parseTree(html);
 
-  tree<HTML::Node>::iterator it = dom.begin();
-  tree<HTML::Node>::iterator end = dom.end();
-
-  for (; it != end; ++it) {
-    if (it->tagName() == "body") {
-      
-      cout << it->text() << endl;
-      body = it->text();
-      break;
-    }
-  }
-  return body;
-}
-*/
 list<Page> crawl(string startUrl, int depth) {
   list<Page> pages;
   queue<string> unvisited;
@@ -144,6 +113,7 @@ list<Page> crawl(string startUrl, int depth) {
 int main(void) {
   int n = 10;
   string url = "https://www.messagexchange.com";
+
   list<Page> pages = crawl(url, n);
   list<Page>::iterator it = pages.begin();
   list<Page>::iterator end = pages.end();
@@ -159,20 +129,5 @@ int main(void) {
   }
 
   cout << "total, " << totalUniqWords.size() << endl;
-
-
-  
-  // if queue.size() < 10
-  // for each links
-  // visit 
-  // get body
-  // body.split.getUniqWords.size()
-  //
-  // for each links
-  // visit
-  // get body
-  // body.split getUniqWords
-  // total.insert uniqueWords
-  // total.size()
   return 0;
 }
