@@ -29,8 +29,10 @@ size_t write_to_string(void *ptr, size_t size, size_t count, void *stream) {
 
 class Page {
 public: 
+  string url;
   string body;
-  Page (string b) {
+  Page (string u, string b) {
+    url = u;
     body = b;
   }
 
@@ -129,7 +131,7 @@ list<Page> crawl(string startUrl, int depth) {
       }
     }
     string body = html;
-    Page *page = new Page(body);
+    Page *page = new Page(link, body);
     pages.push_back(*page);
     if(pages.size() >= depth) {
       break;
@@ -146,7 +148,7 @@ int main(void) {
   list<Page>::iterator it = pages.begin();
   list<Page>::iterator end = pages.end();
   for (; it != end; ++it) {
-    cout << it->countUniqWords() <<endl;
+    cout << it->url <<", " << it->countUniqWords() <<endl;
   }
   
   // if queue.size() < 10
