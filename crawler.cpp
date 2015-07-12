@@ -11,6 +11,16 @@
 using namespace std;
 using namespace htmlcxx;
 
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    size_t written = fwrite(ptr, size, nmemb, stream);
+    return written;
+}
+
+size_t write_to_string(void *ptr, size_t size, size_t count, void *stream) {
+  ((string*)stream)->append((char*)ptr, 0, size*count);
+  return size*count;
+}
+
 /*
 class WebPage {
   list<string> urls;
@@ -30,35 +40,52 @@ class WebPage {
 */
 
 string getPageContent() {
-  stirng content = "";
+  string content = "";
   CURL *curl;
-  FILE *fp;
+  //FILE *fp;
   CURLcode res;
   char *url = "https://www.messagexchange.com";
-  char outfilename[FILENAME_MAX] = "content.txt";
+  //char outfilename[FILENAME_MAX] = "content.txt";
   curl = curl_easy_init();
   if (curl) {
-      fp = fopen(outfilename,"wb");
+      //fp = fopen(outfilename,"wb");
       curl_easy_setopt(curl, CURLOPT_URL, url);
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, &content);
       res = curl_easy_perform(curl);
 
       curl_easy_cleanup(curl);
-      fclose(fp);
+      //fclose(fp);
   }
   return content;
 }
 
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-    size_t written = fwrite(ptr, size, nmemb, stream);
-    return written;
+vector<string> getLinks(string html, int depth) {
+  vector<string> links;
+
+  HTML::ParserDom parser;
+  tree<HTML::Node> dom = parser.parseTree(html);
+
+  tree<HTML::Node>::iterator it = dom.begin();
+  tree<HTML::Node>::iterator end = dom.end();
+
+  for (; it != end; ++it) {
+    if (it->tagName() == "a") {
+      it->parseAttributes();
+      string link = it->attribute("href").second;
+      cout << link << endl;
+      links.push_back(link);
+    }
+  }
+
+  return links;
 }
 
 int main(void) {
   int n = 10;
   string html = getPageContent();
-  //getLinks(html);
+  //cout << html << endl;
+  getLinks(html, n);
   // if queue.size() < 10
   // for each links
   // visit 
