@@ -4,12 +4,15 @@
 #include <list>
 #include <queue>
 #include <set>
+#include <vector>
 
 #include <curl/curl.h>
 #include <htmlcxx/html/ParserDom.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace htmlcxx;
+using namespace boost::algorithm;
 
 /*
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
@@ -30,19 +33,23 @@ public:
   Page (string b) {
     body = b;
   }
-  /*
+
   set<string> getUniqWords() {
     set<string> uniqueWords;
     // string[] words = body.split(" ");
-    for(int i = 0; i < words.length; i++) {
-      uniqueWords.insert(words[i]);
+    vector<string> allWords;
+    split(allWords, body, is_space());
+    vector<string>::iterator it = allWords.begin();
+    vector<string>::iterator end = allWords.end();
+    for(; it != end; ++it) {
+      uniqueWords.insert(*it);
     }
+    return uniqueWords;
   }
 
   int countUniqWords() {
     return getUniqWords().size();
   }
-  */
 };
 
 string getPageContent(string url) {
@@ -139,7 +146,7 @@ int main(void) {
   list<Page>::iterator it = pages.begin();
   list<Page>::iterator end = pages.end();
   for (; it != end; ++it) {
-    cout << it->body <<endl;
+    cout << it->countUniqWords() <<endl;
   }
   
   // if queue.size() < 10
