@@ -147,9 +147,20 @@ int main(void) {
   list<Page> pages = crawl(url, n);
   list<Page>::iterator it = pages.begin();
   list<Page>::iterator end = pages.end();
+  set<string> totalUniqWords;
   for (; it != end; ++it) {
-    cout << it->url <<", " << it->countUniqWords() <<endl;
+    cout << it->url <<", " << it->countUniqWords() << endl;
+
+    set<string> uniqueWordsPerPage = it->getUniqWords();
+    set<string>::iterator j;
+    for (j = uniqueWordsPerPage.begin(); j != uniqueWordsPerPage.end(); ++j) {
+      totalUniqWords.insert(*j);
+    }
   }
+
+  cout << "total, " << totalUniqWords.size() << endl;
+
+
   
   // if queue.size() < 10
   // for each links
